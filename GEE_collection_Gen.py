@@ -11,7 +11,9 @@ tutorial video available here: https://youtu.be/ODBCPmQBEqU
 
 import ee 
 import calendar
-from datetime import datetime
+#from datetime import datetime
+#from datetime import date
+from datetime import *
 from dateutil.relativedelta import *
 from ee_plugin import Map 
 
@@ -31,21 +33,27 @@ def getDates(startDate, endDate):
     
     startDate = datetime.strptime(startDate, '%Y%m%d')
     endDate = datetime.strptime(endDate, '%Y%m%d')
-    
-    counter = (endDate.year - startDate.year) * 12 + (endDate.month - startDate.month) + 1
+    counter = (date(2020,3,21)-date(2020,1,1)).days+1
+#    counter = (endDate.year - startDate.year) * 365 + (endDate.month - startDate.month) * 30 + (endDate.day - startDate.day) + 1
     for d in range(counter):
         
         collName = "{:02d}".format(d) + "Collection"
-        collStart = startDate + relativedelta(months=+d)
+        collStart = startDate + relativedelta(days=+d)
         finalDay = calendar.monthrange(collStart.year, collStart.month)[1]
-        collEnd = collStart+relativedelta(day=finalDay)
-        layerName = collStart.strftime("%b %Y")
+#        collEnd = collStart+relativedelta(day=finalDay)
+        collEnd = startDate + relativedelta(days=+d+1) 
+        layerName = collStart.strftime("%Y %b %d")
+        print (d)
+        print(collName)
+        print(collStart)
+        print(finalDay)
+        print(collEnd)
         print(layerName)
                 
         yield[collName, collStart.strftime("%Y-%m-%d"), collEnd.strftime("%Y-%m-%d"), layerName]
 
 # change dates here        
-for n in getDates('YYYYmmdd','YYYYmmdd'):
+for n in getDates('20200101','20200321'):
     n[0] = ee.ImageCollection(dataset)\
             .select(column)\
             .filterDate(n[1], n[2])
@@ -53,4 +61,3 @@ for n in getDates('YYYYmmdd','YYYYmmdd'):
     
 
 Map.setCenter(65.27, 24.11, 4)
-
